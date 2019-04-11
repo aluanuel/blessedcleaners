@@ -28,11 +28,6 @@
     </section>
     <!-- /.sidebar -->
   </aside>
-  <?php include 'connection.php';
-  // include 'admin_variables.php';
-   /* $sql=mysqli_query($conn, "SELECT count(*) as stock from stocklist");
-    $sql2=mysqli_query($conn, "SELECT count(*) as users from users WHERE status='active'");*/
-  ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -53,17 +48,13 @@
           <!-- small box -->
           <div class="small-box bg-green">
             <div class="inner">
-            <?php
-              // while($row=mysqli_fetch_array($sql)){
-              //  echo '<h3 align="center">'.$stock.'</h3>'; 
-              // }
-            ?>
-              <p align="center">Items in stocklist</p>
+              <h3><?php echo getCountResult('settings','idsettings','companyName !="Blessed cleaners"');?></h3>
+              <p>Companies Registered</p>
             </div>
             <div class="icon">
               <i class="ion ion-bag"></i>
             </div>
-            <a href="admin_view_stock.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="system_company_accounts_general" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
@@ -71,18 +62,13 @@
           <!-- small box -->
           <div class="small-box bg-aqua">
             <div class="inner">
-              <?php
-              // while($row=mysqli_fetch_array($sql2)){
-              //  echo '<h3 align="center">'.$row['users'].'</h3>'; 
-              // }
-            ?>
-
-              <p align="center">Active system users<br> <?php //echo $sysUsers;?></p>
+              <h3><?php echo getCountResult('settings s, users u','u.idsettings','u.idsettings = s.idsettings AND u.usertype="admin" AND s.status="Active"');?></h3>
+              <p>Companies Fully Registered</p>
             </div>
             <div class="icon">
               <i class="ion ion-stats-bars"></i>
             </div>
-            <a href="admin_new_user.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="system_company_details.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
@@ -90,9 +76,8 @@
           <!-- small box -->
           <div class="small-box bg-yellow">
             <div class="inner">
-              <h3>44</h3>
-
-              <p>User Registrations</p>
+              <h3><?php echo getCountResult('users','idusers','user_account_status="Active"');?></h3>
+              <p>Active system users</p>
             </div>
             <div class="icon">
               <i class="ion ion-person-add"></i>
@@ -105,12 +90,11 @@
           <!-- small box -->
           <div class="small-box bg-red">
             <div class="inner">
-              <h3>65</h3>
-
-              <p>Unique Visitors</p>
+              <h3><?php echo getCountResult('users','idusers','user_account_status="Inactive"');?></h3>
+              <p>Inactive system users</p>
             </div>
             <div class="icon">
-              <i class="ion ion-pie-graph"></i>
+              <i class="ion ion-person"></i>
             </div>
             <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
@@ -118,66 +102,6 @@
         <!-- ./col -->
       </div>
       <!-- /.row -->
-      <!-- Main row -->
-      <div class="row">
-        <!-- Left col -->
-        <section class="col-lg-6 connectedSortable">
-        <!-- solid sales graph -->
-          <div class="box box-solid bg-teal-gradient">
-            <div class="box-header">
-              <i class="fa fa-th"></i>
-
-              <h3 class="box-title">Sales Graph</h3>
-
-              <div class="box-tools pull-right">
-                <button type="button" class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i>
-                </button>
-              </div>
-            </div>
-            <div class="box-body border-radius-none">
-              <div class="chart" id="line-chart" style="height: 250px;"></div>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
-
-        </section>
-        <!-- /.Left col -->
-        <!-- right col (We are only adding the ID to make the widgets sortable)-->
-        <section class="col-lg-6 connectedSortable">
-
-          <!-- Map box -->
-          <div class="box box-solid bg-light-blue-gradient">
-            <div class="box-header">
-              <!-- tools box -->
-              <div class="pull-right box-tools">
-                <button type="button" class="btn btn-primary btn-sm daterange pull-right" data-toggle="tooltip" title="Date range">
-                  <i class="fa fa-calendar"></i></button>
-                <button type="button" class="btn btn-primary btn-sm pull-right" data-widget="collapse" data-toggle="tooltip" title="Collapse" style="margin-right: 5px;">
-                  <i class="fa fa-minus"></i></button>
-              </div>
-              <!-- /. tools -->
-
-              <i class="fa fa-map-marker"></i>
-
-              <h3 class="box-title">
-                Visitors
-              </h3>
-            </div>
-            <div class="box-body">
-              <div id="world-map" style="height: 250px; width: 100%;"></div>
-            </div>
-            <!-- /.box-body-->
-            
-          </div>
-          <!-- /.box -->
-
-        </section>
-        <!-- right col -->
-      </div>
-      <!-- /.row (main row) -->
 
     </section>
     <!-- /.content -->

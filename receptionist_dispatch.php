@@ -47,7 +47,6 @@ include 'header.php';
     <div class="row">
     <?php
         $message = '';
-            $query=mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
             $table_header = "Avaialbe customer orders";
 
             if(isset($_POST['save_bill'])){
@@ -74,7 +73,7 @@ include 'header.php';
           <!-- Horizontal Form -->
           <div class="box box-primary">
             <div class="box-header">
-            <h3 class="box-title">Showing dispatch for all services</h3>
+            <h3 class="box-title">Showing dispatch</h3>
             </div>
             <div class="box-header with-border">
             <div class="row form-group">
@@ -84,10 +83,11 @@ include 'header.php';
                       <div class="input-group-addon">
                         <i class="fa ">Service category</i>
                       </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
+                      <select  class="form-control select2 " name="service_type"  style="width: 100%;">
                       <option>Select</option>
                       <?php
-                          while($row=mysqli_fetch_array($query)){
+                        $query_services=mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
+                          while($row=mysqli_fetch_array($query_services)){
                             echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
                           }
                       ?>
@@ -138,14 +138,24 @@ include 'header.php';
                   <th class="text-blue"><small>Balance</small></th>
                   <th class="text-blue"><small>Customer</small></th>
                   <th class="text-blue"><small>Telephone</small></th>
-                  <th class="text-blue" style="width: 140px;"><small>Action</small></th>
+                  <th class="text-blue" style="width: 150px;"><small>Action</small></th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
                 $i=1;
                 $clear_bill = '';
-                 $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,services s, customer c WHERE a.idorder = o.idorder AND a.idcustomer = c.idcustomer AND o.idcustomer = c.idcustomer AND o.idservice = s.idservice AND a.idsettings = $company_id AND o.order_status = 'Ready'");
+                 if(isset($_POST['search'])){ // search specific data
+              $idservice = $_POST['service_type'];
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Ready'  AND d.order_date BETWEEN '".$date_from."' AND '".$date_to."' AND s.idservice = $idservice ORDER BY d.order_date DESC");
+            }else{  // retrieve all data 
+            $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Ready' ORDER BY d.order_date DESC");
+          }
+                 
                     while($row=mysqli_fetch_array($query)){
                       ?>
                       <tr>

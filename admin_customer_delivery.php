@@ -34,12 +34,11 @@ include 'header.php';
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Customer orders 
+        Dispatch
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      </i>Customer order</li>
-        <li class="active">Assigned orders > <?php echo date("Y-m-d");?></li>
+        <li class="active">Customer Delivery > <?php echo date("Y-m-d");?></li>
       </ol>
     </section>
 
@@ -51,7 +50,7 @@ include 'header.php';
           <!-- Horizontal Form -->
           <div class="box box-primary">
            <div class="box-header">
-            <h3 class="box-title">Showing assigned orders</h3>
+            <h3 class="box-title">Showing customer orders delivered</h3>
             </div>
             <div class="box-header">
             <div class="row form-group">
@@ -61,9 +60,10 @@ include 'header.php';
                       <div class="input-group-addon">
                         <i class="fa ">Service category</i>
                       </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
+                      <select  class="form-control select2 " name="service_type"  style="width: 100%;">
                       <option>Select</option>
                       <?php
+                      $mini_query = mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
                           while($row=mysqli_fetch_array($mini_query)){
                             echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
                           }
@@ -120,7 +120,18 @@ include 'header.php';
                 <?php
                 $i=1;
                 $clear_bill = '';
-                 $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,services s, customer c WHERE a.idorder = o.idorder AND a.idcustomer = c.idcustomer AND o.idcustomer = c.idcustomer AND o.idservice = s.idservice AND a.idsettings = $company_id AND o.order_status = 'Taken'");
+
+                if(isset($_POST['search'])){ // search specific data
+              $idservice = $_POST['service_type'];
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,services s, customer c WHERE a.idorder = o.idorder AND a.idcustomer = c.idcustomer AND o.idcustomer = c.idcustomer AND o.idservice = s.idservice AND s.idservice =$idservice AND o.order_date BETWEEN '".$date_from."' AND '".$date_to."' AND a.idsettings = $company_id AND o.order_status = 'Taken'");
+            }else{  // retrieve all data 
+            $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,services s, customer c WHERE a.idorder = o.idorder AND a.idcustomer = c.idcustomer AND o.idcustomer = c.idcustomer AND o.idservice = s.idservice AND a.idsettings = $company_id AND o.order_status = 'Taken'");
+          }
+                 
                     while($row=mysqli_fetch_array($query)){
                       ?>
                       <tr>
@@ -134,18 +145,15 @@ include 'header.php';
                           $total_cost =  $quantity * getServicePrice('services','service_price','idservice',$row['idservice']);
                           $cash_paid = getSum('order_payment','cash_pay','idorder', $row['idorder']);
                           $balance = $total_cost -$cash_paid;
-                          if($balance > 0){
-                            $clear_bill = '<a data-toggle="modal" href="#order-assign-form'. $row['idorder'].'" class="btn btn-primary pull-left">Clear Bill</a>';
-                          }
                         ?>
                         <td><?php echo $total_cost;?></td>
                         <td><?php echo $cash_paid;?></td>
                         <td><?php echo $balance ;?></td>
                         <td><?php echo $row['fname'].' '.$row['lname'];?></td>
                         <td><?php echo $row['telephone'];?></td>
-                        <td><?php echo $clear_bill; ?></td>
                       </tr>
                       <?php
+                      $i++;
                     }
                       ?>
                     </tbody>

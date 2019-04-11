@@ -46,19 +46,15 @@ include 'header.php';
     <section class="content">
     <div class="row">
     <?php
-            $query=mysqli_query($conn,"SELECT * FROM services WHERE idsettings = 19");
-            $table_header = "Avaialbe customer orders";
-            if(isset($_POST['search'])){
-              $query=mysqli_query($conn,"SELECT * FROM customer_order d LEFT JOIN customer c ON c.id_customer = d.id_customer WHERE d.order_date BETWEEN '".$_POST['date_from']."' GROUP BY c.id_customer");
-              $table_header = "Avaialbe customer orders from ".$_POST['date_from']." to ".$_POST['date_to'];
-            }
+           
+            $table_header = "Showing dispatch";
      ?>
         <!-- right column -->
         <div class="col-md-12">
           <!-- Horizontal Form -->
           <div class="box box-primary">
             <div class="box-header">
-            <h3 class="box-title">Showing dispatch for all services</h3>
+            <h3 class="box-title"><?php echo $table_header; ?></h3>
             </div>
             <div class="box-header with-border">
             <div class="row form-group">
@@ -68,10 +64,11 @@ include 'header.php';
                       <div class="input-group-addon">
                         <i class="fa ">Service category</i>
                       </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
+                      <select  class="form-control select2 " name="service_type"  style="width: 100%;">
                       <option>Select</option>
                       <?php
-                          while($row=mysqli_fetch_array($query)){
+                      $mini_query = mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
+                          while($row=mysqli_fetch_array($mini_query)){
                             echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
                           }
                       ?>
@@ -103,11 +100,6 @@ include 'header.php';
                   <button type="submit" name="search" class="btn btn-default">Search</button>
                 </div>
                 </form>
-                <form method="POST" action="print_sales_report.php" target="_blank">
-                 <div class="col-xs-1">
-                  <button type="submit" name="search" class="btn btn-default" >Print</button>
-                </div> 
-                </form>
               </div>
               
             </div>
@@ -116,33 +108,57 @@ include 'header.php';
             
               <table id="example1" class="table table-bordered table-hover">
                 <thead>
-                <tr>
-                  <th class="text-blue"><small>ID</small></th>
-                  <th class="text-blue"><small>Customer</small></th>
+                  <tr>
+                  <th class="text-blue"><small>S/N</small></th>
+                  <th class="text-blue"><small>Order Number</small></th>
                   <th class="text-blue"><small>Order date</small></th>
-                  <th class="text-blue"><small>Service type</small></th>
+                  <th class="text-blue"><small>Service Type</small></th>
                   <th class="text-blue"><small>Quantity</small></th>
-                  <th class="text-blue"><small>Cost</small></th>
-                  <th class="text-blue"><small>Total paid</small></th>
-                  <th class="text-blue"><small>Action</small></th>
+                  <th class="text-blue"><small>Sevice cost</small></th>
+                  <th class="text-blue"><small>Cash paid</small></th>
+                  <th class="text-blue"><small>Balance</small></th>
+                  <th class="text-blue"><small>Customer</small></th>
+                  <th class="text-blue"><small>Telephone</small></th>
                 </tr>
                 </thead>
                 <tbody>
-                <?php
-                $i=1;
-              //       while($row=mysqli_fetch_array($query)){
-              //   echo '<tr>';
-              //   echo '<td>'.$i.'</td>';
-              //   echo '<td><a href="custom/product_details.php?make='.$row['name'].'&model='.$row['details'].'">'.$row['name'].' '.$row['details'].'</a></td>';
-              //   echo '<td>'.$row['producer'].'</td>';
-              //   echo '<td>'.countStock($row['details'],'NOT SOLD').'</td>';
-              //   echo '<td>'.$row['stock_count'].'</td>';
-              //   echo '<td>'.countStock($row['name'],'SOLD').'</td>';
-              //   echo '</tr>';
-              //   $i++;
-              // }
-              // mysqli_close($conn);
-                ?>
+                  <?php
+                  $i=1;
+                $clear_bill = '';
+
+                if(isset($_POST['search'])){ // search specific data
+              $idservice = $_POST['service_type'];
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Ready'  AND d.order_date BETWEEN '".$date_from."' AND '".$date_to."' AND s.idservice = $idservice ORDER BY d.order_date DESC");
+            }else{  // retrieve all data 
+            $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Ready' ORDER BY d.order_date DESC");
+          }
+                    while($row=mysqli_fetch_array($query)){
+                      ?>
+                      <tr>
+                        <td><?php echo $i;?></td>
+                        <td><?php echo $row['idorder'];?></td>
+                        <td><?php echo $row['order_date'];?></td>
+                        <td><?php echo $row['service_name'];?></td>
+                        <td><?php echo $row['order_quantity'];?></td>
+                        <?php 
+                          $quantity = $row['order_quantity'];
+                          $total_cost =  $quantity * getServicePrice('services','service_price','idservice',$row['idservice']);
+                          $cash_paid = getSum('order_payment','cash_pay','idorder', $row['idorder']);
+                          $balance = $total_cost -$cash_paid;
+                        ?>
+                        <td><?php echo $total_cost;?></td>
+                        <td><?php echo $cash_paid;?></td>
+                        <td><?php echo $balance ;?></td>
+                        <td><?php echo $row['fname'].' '.$row['lname'];?></td>
+                        <td><?php echo $row['telephone'];?></td>
+                      </tr>
+                    <?php 
+                    $i++;
+                  }?>
 
                 </tbody>
                 <tfoot>

@@ -47,28 +47,28 @@ include 'header.php';
     <section class="content">
     <div class="row">
     <?php
-            $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Pending' ORDER BY d.order_date DESC");
+    $table_header = '';
+         if(isset($_POST['search'])){ // search specific data
+              $idservice = $_POST['service_type'];
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
 
-            $table_header = "Avaialbe customer orders";
-            if(isset($_POST['search'])){
-              $query=mysqli_query($conn,"SELECT * FROM customer_order d LEFT JOIN customer c ON c.id_customer = d.id_customer WHERE d.order_date BETWEEN '".$_POST['date_from']."' GROUP BY c.id_customer");
-              $table_header = "Avaialbe customer orders from ".$_POST['date_from']." to ".$_POST['date_to'];
-            }
-            if(isset($_POST['add_queu'])){
-              $id = $_POST['add_queu'];
-              mysqli_query($conn,"UPDATE customer_order SET order_status ='Queued' WHERE id_order ='$id'");
-              mysqli_query($conn,"INSERT INTO process(id_order,added_on,status) VALUES('$id',date(now()),'Queued')");
-              
-            }elseif(isset($_POST['delete_order'])){
-              $query=mysqli_query($conn,"DELETE FROM customer_order WHERE id_order ='".$_POST['delete_order']."'");
-            }
+              $table_header ='Showing customer orders from '.$date_from.' to '.$date_to;
+
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Pending'  AND d.order_date BETWEEN '".$date_from."' AND '".$date_to."' AND s.idservice = $idservice ORDER BY d.order_date DESC");
+            }else{  // retrieve all data 
+            $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Pending' ORDER BY d.order_date DESC");
+            $table_header = 'Showing customer orders';
+          }
      ?>
         <!-- right column -->
         <div class="col-md-12">
           <!-- Horizontal Form -->
           <div class="box box-primary">
            <div class="box-header">
-            <h3 class="box-title">Showing received orders</h3>
+            <h3 class="box-title"><?php echo $table_header; ?></h3>
             </div>
             <div class="box-header">
             <div class="row form-group">
@@ -78,9 +78,10 @@ include 'header.php';
                       <div class="input-group-addon">
                         <i class="fa ">Service category</i>
                       </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
+                      <select  class="form-control select2 " name="service_type"  style="width: 100%;">
                       <option>Select</option>
                       <?php
+                      $mini_query = mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
                           while($row=mysqli_fetch_array($mini_query)){
                             echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
                           }

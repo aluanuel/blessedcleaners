@@ -47,7 +47,7 @@ include 'header.php';
     <div class="row">
     <?php
         $message='';
-            $table_header = "Showing workload for all services";
+            $table_header = "Showing workload assigned";
             
             if(isset($_POST['dispatch'])){
               $id_order = $_POST['dispatch'];
@@ -70,50 +70,6 @@ include 'header.php';
             <h3 class="box-title"><?php echo $table_header;?></h3>
             </div>
             <div class="box-header">
-            <div class="row form-group">
-            <form method="POST" action="">
-            <div class="col-xs-4 pull-left">
-                        <div class="input-group date">
-                      <div class="input-group-addon">
-                        <i class="fa ">Service category</i>
-                      </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
-                      <option>Select</option>
-                      <?php
-                          while($row=mysqli_fetch_array($query)){
-                            echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
-                          }
-                      ?>
-                
-                </select>
-                    </div>
-            </div>
-                <div class="col-xs-5">
-                  <div class="row form-group">
-                    <div class="col-xs-5 pull-left">
-                        <div class="input-group date">
-                      <div class="input-group-addon">
-                        <i class="fa ">From</i>
-                      </div>
-                      <input type="date" name="date_from" class="form-control pull-left" placeholder="YY-MM-DD">
-                    </div>
-                    </div>
-                    <div class="col-xs-6 pull-right">
-                        <div class="input-group date">
-                      <div class="input-group-addon">
-                        <i class="fa">To</i>
-                      </div>
-                      <input type="date" name="date_to" class="form-control pull-right" placeholder="YY-MM-DD">
-                    </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-xs-1">
-                  <button type="submit" name="search" class="btn btn-default">Search</button>
-                </div>
-                </form>
-              </div>
-              
             </div>
             <!-- /.box-header -->
             <div class="box-body">

@@ -45,13 +45,13 @@ if(isset($_POST['submit'])){
 
 	if(mysqli_query($conn,"INSERT INTO customer(fname,lname,telephone,email,username,password) VALUES('$fname','$lname','$telephone','$email','$fname','md5($fname)')")){
     $existing_customer_id = getLastCustomerId('customer','idcustomer');
-    mysqli_query($conn,"INSERT INTO customer_order(order_date,order_quantity,order_status,idcustomer,idservice,idsettings) VALUES('".date("Y:m:n h:i:s")."','$quantity','Pending','$existing_customer_id','$service_id',$company_id)");
+    mysqli_query($conn,"INSERT INTO customer_order(order_quantity,order_status,idcustomer,idservice,idsettings) VALUES('$quantity','Pending','$existing_customer_id','$service_id',$company_id)");
 		$message=alertSuccess();
 	}else{
 		$message=alertError();
 	}
 }else{ 
-  if(mysqli_query($conn,"INSERT INTO customer_order(order_date,order_quantity,order_status,idcustomer,idservice,idsettings) VALUES('".date("Y:m:n h:i:s")."','$quantity','Pending','$existing_customer_id','$service_id',$company_id)")){
+  if(mysqli_query($conn,"INSERT INTO customer_order(order_quantity,order_status,idcustomer,idservice,idsettings) VALUES('$quantity','Pending','$existing_customer_id','$service_id',$company_id)")){
   $message=alertSuccess();
   }else{
     $message=alertError();

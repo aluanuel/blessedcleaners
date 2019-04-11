@@ -34,11 +34,11 @@ include 'header.php';
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Product queue
+        Workload
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Product queue > <?php echo date("Y-m-d");?></li>
+        <li class="active">Workload > <?php echo date("Y-m-d");?></li>
       </ol>
     </section>
 
@@ -46,9 +46,7 @@ include 'header.php';
     <section class="content">
     <div class="row">
     <?php
-            include 'connection.php';
-            $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,users u,services s WHERE a.idorder = o.idorder AND  o.idservice = s.idservice AND o.order_status ='Queued' AND a.idusers = u.idusers AND a.idsettings = $company_id GROUP BY u.idusers");
-            $table_header = "Showing product queue for all services";
+            $table_header = "Showing workload per Washman";
      ?>
         <!-- right column -->
         <div class="col-md-12">
@@ -60,23 +58,6 @@ include 'header.php';
             <div class="box-header">
             <div class="row form-group">
             <form method="POST" action="">
-            <div class="col-xs-4 pull-left">
-                        <div class="input-group date">
-                      <div class="input-group-addon">
-                        <i class="fa ">Service category</i>
-                      </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
-                      <option>Select</option>
-                      <?php
-                      $query_services = mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
-                          while($row=mysqli_fetch_array($query_services)){
-                            echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
-                          }
-                      ?>
-                
-                </select>
-                    </div>
-            </div>
                 <div class="col-xs-5">
                   <div class="row form-group">
                     <div class="col-xs-5 pull-left">
@@ -119,13 +100,27 @@ include 'header.php';
                 <tbody>
                 <?php
                 $i=1;
+                $date_from = '0000-00-00 00:00:00';
+                $date_to =date("Y-m-d").' 23:59:59';
+                if(isset($_POST['search'])){ // search specific data
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
+
+              $table_header ='Showing customer orders from '.$date_from.' to '.$date_to;
+
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,users u,services s WHERE a.idorder = o.idorder AND  o.idservice = s.idservice AND o.order_status ='Queued' AND a.assigned_on BETWEEN '".$date_from."' AND '".$date_to."' AND a.idusers = u.idusers AND a.idsettings = $company_id GROUP BY u.idusers");
+            }else{
+                $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,users u,services s WHERE a.idorder = o.idorder AND  o.idservice = s.idservice AND o.order_status ='Queued' AND a.idusers = u.idusers AND a.idsettings = $company_id GROUP BY u.idusers");
+              }
                     while($row=mysqli_fetch_array($query)){
                       ?>
                       <tr>
                         <td><?php echo $i;?></td>
                         <td><?php echo $row['assigned_on'];?></td>
                         <td><?php echo $row['fname'].' '.$row['lname'];?></td>
-                        <td><?php echo getCountResult('assign_order','idassign_order','idusers = '.$row['idusers'].' AND idsettings ='.$company_id);?></td>
+                        <td><?php echo getCountResult('assign_order a,customer_order o','a.idassign_order','a.idusers = '.$row['idusers'].' AND a.idorder=o.idorder AND o.order_status="Queued" AND a.assigned_on BETWEEN "'.$date_from.'" AND "'.$date_to.'" AND a.idsettings ='.$company_id);?></td>
                       </tr>
               <?php
               }

@@ -47,33 +47,48 @@
     <section class="content">
       <!-- Small boxes (Stat box) -->
       <div class="row">
-        <div class="col-lg-6 col-xs-6">
+        <div class="col-lg-4 col-xs-6">
           <!-- small box -->
-          <div class="small-box bg-green-gradient">
+          <div class="small-box bg-aqua">
             <div class="inner">
-              <h3>150</h3>
+              <h3><?php echo getCountResult('customer_order','idorder','order_status="Pending" AND idsettings = '.$company_id);?></h3>
 
               <p>New Orders</p>
             </div>
             <div class="icon">
-              <i class="ion ion-bag"></i>
+              <i class="fa fa-shopping-cart"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="receptionist_view_orders.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
-        <div class="col-lg-6 col-xs-6">
+        <div class="col-lg-4 col-xs-6">
           <!-- small box -->
-          <div class="small-box bg-aqua">
+          <div class="small-box bg-green">
             <div class="inner">
-              <h3>53<sup style="font-size: 20px">%</sup></h3>
+              <h3><?php echo getCountResult('customer_order','idorder','order_status="Ready" AND idsettings = '.$company_id);?></h3>
 
-              <p>Bounce Rate</p>
+              <p>Orders Ready for Dispatch</p>
             </div>
             <div class="icon">
-              <i class="ion ion-stats-bars"></i>
+              <i class="fa fa-cart-plus"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="receptionist_dispatch.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-4 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3><?php echo getCountResult('customer_order','idorder','order_status="Taken" AND idsettings = '.$company_id);?></h3>
+
+              <p>Orders Delivered to Customers</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-person-add"></i>
+            </div>
+            <a href="receptionist_customer_delivery.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
@@ -84,7 +99,7 @@
         <!-- Left col -->
         <section class="col-lg-12  connectedSortable">
 		    <!-- solid sales graph -->
-            <div class="box">
+            <!-- <div class="box">
             <div class="box-header with-border">
               <h3 class="box-title">Monthly Recap Report</h3>
 
@@ -104,21 +119,21 @@
                 </div>
                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
               </div>
-            </div>
+            </div> -->
             <!-- /.box-header -->
-            <div class="box-body">
+            <!-- <div class="box-body">
               <div class="row">
                 <div class="col-md-12">
                   <p class="text-center">
                     <strong>Sales: 1 Jan, 2014 - 30 Jul, 2014</strong>
                   </p>
 
-                  <div class="chart">
+                  <div class="chart"> -->
                     <!-- Sales Chart Canvas -->
-                    <canvas id="salesChart" style="height: 240px;"></canvas>
-                  </div>
+                  <!--   <canvas id="salesChart" style="height: 240px;"></canvas>
+                  </div> -->
                   <!-- /.chart-responsive -->
-                </div>
+                <!-- </div> -->
                 <!-- /.col -->
                 <!-- <div class="col-md-4">
                   <p class="text-center">
@@ -163,52 +178,52 @@
                   <!-- /.progress-group -->
                 <!-- </div> -->
                 <!-- /.col -->
-              </div>
+              <!-- </div> -->
               <!-- /.row -->
-            </div>
+            <!-- </div> -->
             <!-- ./box-body -->
-            <div class="box-footer">
+          <!--   <div class="box-footer">
               <div class="row">
                 <div class="col-sm-3 col-xs-6">
                   <div class="description-block border-right">
                     <span class="description-percentage text-green"><i class="fa fa-caret-up"></i> 17%</span>
                     <h5 class="description-header">$35,210.43</h5>
                     <span class="description-text">TOTAL REVENUE</span>
-                  </div>
+                  </div> -->
                   <!-- /.description-block -->
-                </div>
+                <!-- </div> -->
                 <!-- /.col -->
-                <div class="col-sm-3 col-xs-6">
+               <!--  <div class="col-sm-3 col-xs-6">
                   <div class="description-block border-right">
                     <span class="description-percentage text-yellow"><i class="fa fa-caret-left"></i> 0%</span>
                     <h5 class="description-header">$10,390.90</h5>
                     <span class="description-text">TOTAL COST</span>
-                  </div>
+                  </div> -->
                   <!-- /.description-block -->
-                </div>
+                <!-- </div> -->
                 <!-- /.col -->
-                <div class="col-sm-3 col-xs-6">
+               <!--  <div class="col-sm-3 col-xs-6">
                   <div class="description-block border-right">
                     <span class="description-percentage text-green"><i class="fa fa-caret-up"></i> 20%</span>
                     <h5 class="description-header">$24,813.53</h5>
                     <span class="description-text">TOTAL PROFIT</span>
-                  </div>
+                  </div> -->
                   <!-- /.description-block -->
-                </div>
+                <!-- </div> -->
                 <!-- /.col -->
-                <div class="col-sm-3 col-xs-6">
+                <!-- <div class="col-sm-3 col-xs-6">
                   <div class="description-block">
                     <span class="description-percentage text-red"><i class="fa fa-caret-down"></i> 18%</span>
                     <h5 class="description-header">1200</h5>
                     <span class="description-text">GOAL COMPLETIONS</span>
-                  </div>
+                  </div> -->
                   <!-- /.description-block -->
-                </div>
-              </div>
+                <!-- </div> -->
+              <!-- </div> -->
               <!-- /.row -->
-            </div>
+            <!-- </div> -->
             <!-- /.box-footer -->
-          </div>
+          <!-- </div> -->
           <!-- /.box -->
 
         </section>

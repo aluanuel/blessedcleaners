@@ -4,7 +4,6 @@
 include'admin_session.php';
   $user=$_SESSION['admin'];
 include 'header.php';
-$query = mysqli_query($conn,"SELECT * FROM users WHERE idsettings = $company_id");
 ?>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
@@ -42,12 +41,30 @@ $query = mysqli_query($conn,"SELECT * FROM users WHERE idsettings = $company_id"
         <li class="active">View users > <?php echo date("Y-m-d");?></li>
       </ol>
     </section>
-    <?php $error='';?>
+    <?php
+    $message = '';
+
+        if(isset($_POST['action'])){ //Activate or deactivate user account
+            if(mysqli_query($conn,"UPDATE users SET user_account_status = '".$_POST['action']."' WHERE idusers = '".$_POST['iduser']."'")){
+              $message = alertSuccess();
+            }else{
+              $message = alertError();
+            }
+        }elseif (isset($_POST['delete_user'])) {
+          if(mysqli_query($conn,"DELETE FROM users WHERE idusers = '".$_POST['iduser']."'")){
+            $message = alertSuccess();
+          }else{
+            $message = alertError();
+          }
+        }
+        $query = mysqli_query($conn,"SELECT * FROM users WHERE idsettings = $company_id"); //select all users for a particular company from users table
+    ?>
     <!-- Main content -->
     <section class="content">
     <div class="row">
         <!-- left column -->
         <div class="col-md-12">
+          <?php echo $message; ?>
           <!-- general form elements -->
           <div class="box box-primary">
             <div class="box-header with-border">
@@ -65,23 +82,45 @@ $query = mysqli_query($conn,"SELECT * FROM users WHERE idsettings = $company_id"
                   <th class="text-primary">Email</th>
                   <th class="text-primary">Usertype</th>
                   <th class="text-primary">Account status</th>
-                  <th class="text-primary">Action</th>
+                  <th class="text-primary" style="width: 140px;">Action</th>
                 </tr>
                 </thead>
                 <tbody>
                   <?php
                   if(mysqli_num_rows($query)>0){
                     $x=1;
+                    $account_status = '';
+                    $action_value = '';
                     while($row = mysqli_fetch_array($query)){
-                      echo '<tr>';
-                      echo '<td>'.$x.'</td>';
-                      echo '<td>'.$row['fname'].' '.$row['lname'].'</td>';
-                      echo '<td>'.$row['telephone'].'</td>';
-                      echo '<td>'.$row['email'].'</td>';
-                      echo '<td>'.$row['usertype'].'</td>';
-                      echo '<td>'.$row['user_account_status'].'</td>';
-                      echo '<td>'.$row['user_account_status'].'</td>';
-                      echo '</tr>';
+                      ?>
+                      <tr>
+                      <td><?php echo $x;?></td>
+                      <td><?php echo $row['fname'].' '.$row['lname'];?></td>
+                      <td><?php echo $row['telephone'];?></td>
+                      <td><?php echo $row['email'];?></td>
+                      <td><?php echo $row['usertype'];?></td>
+                      <td><?php echo $row['user_account_status'];?></td>
+                      <?php
+                      $current_status = $row['user_account_status'];
+                      if($current_status == 'Active'){
+                        $account_status = 'Deactivate';
+                        $action_value = 'Inactive';
+
+                      }else{
+                        $account_status = 'Activate';
+                        $action_value = 'Active';
+                      }
+                      ?>
+                      <td><div class="">
+                        <form action="" method="post">
+                        <input type="hidden" name="iduser" value="<?php echo $row['idusers'];?>">
+                        <button type="submit" class="btn btn-primary pull-left" name="action" value="<?php echo $action_value;?>"><?php echo $account_status;?></button>
+                      </form>
+                      <form action="" method="post">
+                        <input type="hidden" name="iduser" value="<?php echo $row['idusers'];?>">
+                        <button type="submit" name="delete_user" class="btn btn-danger pull-right">Delete</button>
+                      </form></div></td>
+                      <?php
                       $x++;
                     }
                   }

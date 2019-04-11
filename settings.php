@@ -41,33 +41,30 @@
       </ol>
     </section>
 <?php
-  include 'connection.php';
   $message='';
-  $color=mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $id_company");
-  $expense=mysqli_query($conn,"SELECT * FROM users WHERE idsettings = $id_company");
   if(isset($_POST['addservice'])){
           $service = $_POST['service'];
           $price = $_POST['price'];
-              if(mysqli_query($conn,"INSERT INTO services(service_name,service_price,idsettings) VALUES('$service',$price,$id_company)")){
+              if(mysqli_query($conn,"INSERT INTO services(service_name,service_price,idsettings) VALUES('$service',$price,$company_id)")){
                 $message=alertSuccess();
-                $color=mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $id_company");
               }else{
                 $message=alertError();
-                $color=mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $id_company");
+              }
+            }elseif (isset($_POST['save_changes'])) {
+              if(mysqli_query($conn,"UPDATE services SET service_name ='".$_POST['service_name']."',service_price='".$_POST['service_price']."' WHERE idservice ='".$_POST['idservice']."' AND idsettings = $company_id")){
+                $message=alertSuccess();
+              }else{
+                $message=alertError();
+              }
+            }elseif (isset($_POST['delete_service'])) {
+              if(mysqli_query($conn,"DELETE FROM services WHERE idservice ='".$_POST['idservice']."'")){
+                $message=alertSuccess();
+              }else{
+                $message=alertError();
               }
             }
-              
-            // }elseif (isset($_POST['addexpense'])) {
-            //   $sql=mysqli_query($conn,"INSERT INTO expenses(expense_type) VALUES('".$_POST['expense']."')")or die(mysqli_error($conn));
-            //   $expense=mysqli_query($conn,"SELECT * FROM expenses");
-            // }
-            // elseif (isset($_POST['delete_service'])) {
-            //   $sql=mysqli_query($conn," DELETE FROM  services WHERE idservice='".$_POST['delete_service']."'")or die(mysqli_error($conn));
-            //   $color=mysqli_query($conn,"SELECT * FROM services");
-            // }elseif (isset($_POST['delete_user'])) {
-            //   $sql=mysqli_query($conn," DELETE FROM  users WHERE idusers='".$_POST['delete_user']."'")or die("Record cannot be deleted");
-            //   $expense=mysqli_query($conn,"SELECT * FROM users WHERE idsettings = 19");
-            // }
+  $service=mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
+  
 ?>
     <!-- Main content -->
     <section class="content">
@@ -94,13 +91,50 @@
                 <tbody>
                 <?php
                 $x=1;
-                 while($row=mysqli_fetch_array($color)){ 
-                  echo '<tr>';
-                   echo '<td>'.$x.'</td>';
-                   echo '<td>'.$row['service_name'].'</td>';
-                   echo '<td>'.$row['service_price'].'</td>';
-                   echo '<td><div><button type="submit" name="delete_service" value="'.$row['idservice'].'" class="btn btn-primary btn-sm btn-col-xs-6 pull-left">Change</button><form action="" method="POST"><button type="submit" name="delete_service" value="'.$row['idservice'].'" class="btn btn-danger btn-sm btn-col-xs-6 pull-right">Delete</button></form></div></td>';
-                  echo '</tr>';
+                 while($row=mysqli_fetch_array($service)){ ?>
+                  <tr>
+                   <td><?php echo $x;?></td>
+                   <td><?php echo $row['service_name'];?></td>
+                   <td><?php echo $row['service_price'];?></td>
+                   <td><div class=""><a data-toggle="modal" href="#order-assign-form<?php echo $row['idservice'];?>" class="btn btn-primary pull-left">Change</a><form method="post" action=""><button class="btn btn-danger pull-right" name="delete_service" type="submit">Delete</button>
+                  <input type="hidden" name="idservice" value="<?php echo $row['idservice'];?>"></form></div></td>
+                <div class="modal modal-default fade" id="order-assign-form<?php echo $row['idservice'];?>">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title text-center text-primary">Service Editting Form</h4>
+            </div>
+            <form action="" method="post">
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="row form-group">
+                            <div class="col-xs-6">
+                              <input type="hidden" name="idservice" value="<?php echo $row['idservice'];?>">
+                                <label class="text-info">Service name</label>
+                                <input type="text" class="form-control" name="service_name" value="<?php echo $row['service_name']?>">
+                            </div>
+                            <div class="col-xs-6">
+                              
+                                <label class="text-info">Price</label>
+                                <input type="text" class="form-control" name="service_price" value="<?php echo $row['service_price']?>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="reset" class="btn btn-warning btn-md pull-left" data-dismiss="modal">Cancel</button>
+                    <button type="submit" name="save_changes" class="btn btn-success btn-md">Save</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+                  </tr>
+                  <?php
                   $x++;
                   }
                   ?>

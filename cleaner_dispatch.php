@@ -46,19 +46,28 @@ include 'header.php';
     <section class="content">
     <div class="row">
     <?php
+    if(isset($_POST['search'])){ // search specific data
+              $idservice = $_POST['service_type'];
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
+
+              $table_header ='Showing customer orders delivered from '.$date_from.' to '.$date_to;
+
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,users u,services s WHERE a.idorder = o.idorder and o.idservice = s.idservice AND a.idusers = u.idusers AND a.idsettings = $company_id AND o.order_status = 'Ready' AND s.idservice='$idservice' AND o.order_date BETWEEN '".$date_from."' AND '".$date_to."' AND u.username = '".$user."'");
+            }else{  // retrieve all data 
             $query=mysqli_query($conn,"SELECT * FROM assign_order a, customer_order o,users u,services s WHERE a.idorder = o.idorder and o.idservice = s.idservice AND a.idusers = u.idusers AND a.idsettings = $company_id AND o.order_status = 'Ready' AND u.username = '".$user."'");
-            $table_header = "Avaialbe customer orders";
-            if(isset($_POST['search'])){
-              $query=mysqli_query($conn,"SELECT * FROM customer_order d LEFT JOIN customer c ON c.id_customer = d.id_customer WHERE d.order_date BETWEEN '".$_POST['date_from']."' GROUP BY c.id_customer");
-              $table_header = "Avaialbe customer orders from ".$_POST['date_from']." to ".$_POST['date_to'];
-            }
+            $table_header = "Showing customer orders delivered";
+          }
+            
      ?>
         <!-- right column -->
         <div class="col-md-12">
           <!-- Horizontal Form -->
           <div class="box box-primary">
             <div class="box-header">
-            <h3 class="box-title">Showing dispatch for all services</h3>
+            <h3 class="box-title"><?php echo $table_header; ?></h3>
             </div>
             <div class="box-header with-border">
             <div class="row form-group">
@@ -68,8 +77,14 @@ include 'header.php';
                       <div class="input-group-addon">
                         <i class="fa ">Service category</i>
                       </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
+                      <select  class="form-control select2 " name="service_type"  style="width: 100%;">
                       <option>Select</option>
+                      <?php
+                      $mini_query = mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
+                          while($row=mysqli_fetch_array($mini_query)){
+                            echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
+                          }
+                      ?>
                 
                 </select>
                     </div>

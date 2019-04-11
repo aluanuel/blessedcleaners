@@ -48,12 +48,14 @@ include 'header.php';
           <!-- small box -->
           <div class="small-box bg-green">
             <div class="inner">
-              <p align="center">Items in stocklist</p>
+              <h3><?php echo getCountResult('customer_order','idorder','order_status="Pending" AND idsettings = '.$company_id);?></h3>
+
+              <p>New Orders</p>
             </div>
             <div class="icon">
-              <i class="ion ion-bag"></i>
+              <i class="fa fa-shopping-cart"></i>
             </div>
-            <a href="admin_view_stock.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="admin_view_items.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
@@ -61,13 +63,13 @@ include 'header.php';
           <!-- small box -->
           <div class="small-box bg-aqua">
             <div class="inner">
-
-              <p align="center">Active system users<br></p>
+              <h3><?php echo getCountResult('customer_order','idorder','order_status="Ready" AND idsettings = '.$company_id);?></h3>
+              <p>Orders Ready for Dispatch</p>
             </div>
             <div class="icon">
-              <i class="ion ion-stats-bars"></i>
+              <i class="fa fa-cart-plus"></i>
             </div>
-            <a href="admin_new_user.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="admin_dispatch.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
@@ -75,14 +77,14 @@ include 'header.php';
           <!-- small box -->
           <div class="small-box bg-yellow">
             <div class="inner">
-              <h3>44</h3>
+              <h3><?php echo getCountResult('customer_order','idorder','order_status="Taken" AND idsettings = '.$company_id);?></h3>
 
-              <p>User Registrations</p>
+              <p>Orders Delivered to Customers</p>
             </div>
             <div class="icon">
               <i class="ion ion-person-add"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="admin_customer_delivery.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
@@ -90,14 +92,14 @@ include 'header.php';
           <!-- small box -->
           <div class="small-box bg-red">
             <div class="inner">
-              <h3>65</h3>
+              <h3><?php echo getCountResult('users','idusers','idsettings='.$company_id);?></h3>
 
-              <p>Unique Visitors</p>
+              <p>System users</p>
             </div>
             <div class="icon">
-              <i class="ion ion-pie-graph"></i>
+              <i class="ion ion-person"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="admin_view_users.php" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
@@ -105,62 +107,6 @@ include 'header.php';
       <!-- /.row -->
       <!-- Main row -->
       <div class="row">
-        <!-- Left col -->
-        <section class="col-lg-6 connectedSortable">
-		    <!-- solid sales graph -->
-          <div class="box box-solid bg-teal-gradient">
-            <div class="box-header">
-              <i class="fa fa-th"></i>
-
-              <h3 class="box-title">Sales Graph</h3>
-
-              <div class="box-tools pull-right">
-                <button type="button" class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i>
-                </button>
-              </div>
-            </div>
-            <div class="box-body border-radius-none">
-              <div class="chart" id="line-chart" style="height: 250px;"></div>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
-
-        </section>
-        <!-- /.Left col -->
-        <!-- right col (We are only adding the ID to make the widgets sortable)-->
-        <section class="col-lg-6 connectedSortable">
-
-          <!-- Map box -->
-          <div class="box box-solid bg-light-blue-gradient">
-            <div class="box-header">
-              <!-- tools box -->
-              <div class="pull-right box-tools">
-                <button type="button" class="btn btn-primary btn-sm daterange pull-right" data-toggle="tooltip" title="Date range">
-                  <i class="fa fa-calendar"></i></button>
-                <button type="button" class="btn btn-primary btn-sm pull-right" data-widget="collapse" data-toggle="tooltip" title="Collapse" style="margin-right: 5px;">
-                  <i class="fa fa-minus"></i></button>
-              </div>
-              <!-- /. tools -->
-
-              <i class="fa fa-map-marker"></i>
-
-              <h3 class="box-title">
-                Visitors
-              </h3>
-            </div>
-            <div class="box-body">
-              <div id="world-map" style="height: 250px; width: 100%;"></div>
-            </div>
-            <!-- /.box-body-->
-            
-          </div>
-          <!-- /.box -->
-
-        </section>
-        <!-- right col -->
       </div>
       <!-- /.row (main row) -->
 

@@ -38,7 +38,6 @@ include 'header.php';
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li>Customer order</li>
         <li class="active">Received orders > <?php echo date("Y-m-d");?></li>
       </ol>
     </section>
@@ -48,14 +47,7 @@ include 'header.php';
     <div class="row">
     <?php
     $message='';            
-    $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Pending' ORDER BY d.order_date DESC");
-
-
-            $table_header = "Avaialbe customer orders";
-            if(isset($_POST['search'])){
-              $query=mysqli_query($conn,"SELECT * FROM customer_order d LEFT JOIN customer c ON c.id_customer = d.id_customer WHERE d.order_date BETWEEN '".$_POST['date_from']."' GROUP BY c.id_customer");
-              $table_header = "Avaialbe customer orders from ".$_POST['date_from']." to ".$_POST['date_to'];
-            }
+    
             if(isset($_POST['save_task_assigned'])){
               $order_id = $_POST['customer_order'];
               $customer_id = $_POST['customer'];
@@ -68,7 +60,7 @@ include 'header.php';
   }
               
             }elseif(isset($_POST['delete_order'])){
-              $query=mysqli_query($conn,"DELETE FROM customer_order WHERE id_order ='".$_POST['delete_order']."'");
+              $query=mysqli_query($conn,"DELETE FROM customer_order WHERE id_order ='".$_POST['id_order']."'");
             }
      ?>
         <!-- right column -->
@@ -87,9 +79,10 @@ include 'header.php';
                       <div class="input-group-addon">
                         <i class="fa ">Service category</i>
                       </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
+                      <select  class="form-control select2 " name="service_type"  style="width: 100%;">
                       <option>Select</option>
                       <?php
+                      $mini_query = mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
                           while($row=mysqli_fetch_array($mini_query)){
                             echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
                           }
@@ -137,12 +130,26 @@ include 'header.php';
                   <th class="text-blue"><small>Service type</small></th>
                   <th class="text-blue"><small>Quantity</small></th>
                   <th class="text-blue"><small>Status</small></th>
-                  <th class="text-blue" style="width: 110px;"><small>Action</small></th>
+                  <th class="text-blue" style="width: 120px;"><small>Action</small></th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
                 $i=1;
+                if(isset($_POST['search'])){ // search specific data
+              $idservice = $_POST['service_type'];
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
+
+              $table_header ='Showing customer orders from '.$date_from.' to '.$date_to;
+
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Pending'  AND d.order_date BETWEEN '".$date_from."' AND '".$date_to."' AND s.idservice = $idservice ORDER BY d.order_date DESC");
+            }else{  // retrieve all data 
+            $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Pending' ORDER BY d.order_date DESC");
+            $table_header = 'Showing customer orders';
+          }
                 if(mysqli_num_rows($query) > 0){
                     while($row=mysqli_fetch_array($query)){?>
                 <tr>
@@ -152,7 +159,8 @@ include 'header.php';
                 <td><?php echo $row['service_name']; ?></td>
                 <td><?php echo $row['order_quantity']; ?></td>
                 <td><?php echo $row['order_status']; ?></td>
-                <td><div class=""><a data-toggle="modal" href="#order-assign-form<?php echo $row['idorder'];?>" class="btn btn-primary pull-left">Assign</a><a href="" class="btn btn-danger pull-right">Delete</a></div></td>
+                <td><div class=""><a data-toggle="modal" href="#order-assign-form<?php echo $row['idorder'];?>" class="btn btn-primary pull-left">Assign</a><form method="post" action=""><button class="btn btn-danger" name="delete_order" type="submit">Delete</button>
+                  <input type="hidden" name="id_order" value="<?php echo $row['idorder'];?>"></form></div></td>
                 <div class="modal modal-default fade" id="order-assign-form<?php echo $row['idorder'];?>">
     <div class="modal-dialog">
         <div class="modal-content">

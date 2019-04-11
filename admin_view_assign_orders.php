@@ -47,19 +47,31 @@ include 'header.php';
     <section class="content">
     <div class="row">
     <?php
-            $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND s.idsettings = t.idsettings AND d.order_status = 'Queued' ORDER BY order_date DESC");
+    $table_header = '';
 
-            $table_header = "Avaialbe customer orders";
-            if(isset($_POST['search'])){
-              $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.order_date BETWEEN '".$_POST['date_from']."' AND'".$_POST['date_to']."'   AND s.idsettings = t.idsettings AND d.order_status = 'Queued' ORDER BY order_date DESC");
-            }
+          if(isset($_POST['search'])){ // search specific data
+              $idservice = $_POST['service_type'];
+              $date_from = $_POST['date_from'];
+              $date_to = $_POST['date_to'];
+
+              $table_header = 'Showing assigned orders from '.$date_from.' to '.$date_to;
+
+              $date_from = $date_from.' 00:00:00'; //format the date to timestamp
+              $date_to = $date_to.' 23:59:59'; //format date to timestamp
+               $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Queued'  AND d.order_date BETWEEN '".$date_from."' AND '".$date_to."' AND s.idservice = $idservice ORDER BY d.order_date DESC");
+
+            }else{  // retrieve all data 
+            $query=mysqli_query($conn,"SELECT * FROM customer_order d, customer c, services s, settings t WHERE c.idcustomer = d.idcustomer AND d.idservice = s.idservice AND d.idsettings = t.idsettings AND d.idsettings = $company_id AND d.order_status = 'Queued' ORDER BY d.order_date DESC");
+            $table_header = 'Showing assigned orders';
+          }
+            
      ?>
         <!-- right column -->
         <div class="col-md-12">
           <!-- Horizontal Form -->
           <div class="box box-primary">
            <div class="box-header">
-            <h3 class="box-title">Showing assigned orders</h3>
+            <h3 class="box-title"><?php echo $table_header; ?></h3>
             </div>
             <div class="box-header">
             <div class="row form-group">
@@ -69,9 +81,10 @@ include 'header.php';
                       <div class="input-group-addon">
                         <i class="fa ">Service category</i>
                       </div>
-                      <select  class="form-control select2 " name="particulars"  style="width: 100%;">
+                      <select  class="form-control select2 " name="service_type"  style="width: 100%;">
                       <option>Select</option>
                       <?php
+                      $mini_query = mysqli_query($conn,"SELECT * FROM services WHERE idsettings = $company_id");
                           while($row=mysqli_fetch_array($mini_query)){
                             echo '<option value="'.$row['idservice'].'">'.$row['service_name'].'</option>';
                           }
